@@ -7,5 +7,10 @@
         public EmployeeRepository(AppDbContext context) => _context = context;
 
         public Task<IQueryable<Employee>> GetAll() => Task.Run(()=> _context.Employees.AsNoTracking());
+
+        public Task PostAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

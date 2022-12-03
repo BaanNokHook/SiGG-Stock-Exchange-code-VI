@@ -2,5 +2,8 @@
 
 public class AppUser : IdentityUser
 {
+    internal object CustomerId;
+    internal object StockName;
+
     public string FullName { get; set; }
 }

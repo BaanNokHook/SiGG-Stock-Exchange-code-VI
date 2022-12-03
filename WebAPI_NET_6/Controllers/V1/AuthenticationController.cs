@@ -8,6 +8,9 @@
 public class AuthenticationController : ControllerBase
 {
     private readonly IAuthenticationManager _authenticationManager;
+    private object Delete;
+    private object FindID;
+    private object getbyName;
 
     public AuthenticationController(IAuthenticationManager authenticationManager)
     {
@@ -76,4 +79,144 @@ public class AuthenticationController : ControllerBase
 
         return Ok(authResult);
     }
+
+    [HttpGet("UUID")]
+    [AllowAnonymous]
+    [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(AuthResult))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(List<ErrorResult>))]
+    [ProducesDefaultResponseType]
+    public async Task<IActionResult> UUID([FromBody] RegisterAppUserDTO register)
+    {
+        if (ModelState.IsValid is false)
+            return BadRequest();
+
+        var result = await _authenticationManager.RegisterAppUserAsync(register);
+
+        if (result.Succeeded is false)
+        {
+            var errorResult = new List<ErrorResult>();
+            foreach (var error in result.Errors)
+            {
+                errorResult.Add(new ErrorResult() { ErrorCode = error.Code, Description = error.Description });
+            }
+
+            return BadRequest(errorResult);
+        }
+
+        var authResult = await _authenticationManager.GetSignedInAppUserToken(register.Email);
+
+        return CreatedAtAction(nameof(getbyName), authResult);
+    }
+
+    // GET: /api/auth/UUID
+    [HttpGet("getbyName")]
+    [AllowAnonymous]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(AuthResult))]
+    [ProducesResponseType(statusCode: StatusCodes.Status404NotFound, type: typeof(string))]
+    [ProducesDefaultResponseType]
+    public async Task<IActionResult> UUID(LoginAppUserDTO login)
+    {
+        var user = await _authenticationManager.GetAppUserByEmail(login.Email);
+        var isUserWithPassword = await _authenticationManager.LoginAppUserAsync(login);
+        if (user is null || isUserWithPassword is false)
+            return NotFound("Email or password is not correct.");
+
+        var authResult = await _authenticationManager.GetSignedInAppUserToken(user);
+
+        return Ok(authResult);
+    }
+
+    [HttpPut("FindbyId")]
+    [AllowAnonymous]
+    [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(AuthResult))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(List<ErrorResult>))]
+    [ProducesDefaultResponseType]
+    public async Task<IActionResult> FindbyId([FromBody] RegisterAppUserDTO register)
+    {
+        if (ModelState.IsValid is false)
+            return BadRequest();
+
+        var result = await _authenticationManager.RegisterAppUserAsync(register);
+
+        if (result.Succeeded is false)
+        {
+            var errorResult = new List<ErrorResult>();
+            foreach (var error in result.Errors)
+            {
+                errorResult.Add(new ErrorResult() { ErrorCode = error.Code, Description = error.Description });
+            }
+
+            return BadRequest(errorResult);
+        }
+
+        var authResult = await _authenticationManager.GetSignedInAppUserToken(register.Email);
+
+        return CreatedAtAction(nameof(FindID), authResult);
+    }
+
+        // PUT: /api/auth/login
+    [HttpPut("FindID")]
+    [AllowAnonymous]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(AuthResult))]
+    [ProducesResponseType(statusCode: StatusCodes.Status404NotFound, type: typeof(string))]
+    [ProducesDefaultResponseType]
+    public async Task<IActionResult> putbyId(LoginAppUserDTO login)
+    {
+        var user = await _authenticationManager.GetAppUserByEmail(login.Email);
+        var isUserWithPassword = await _authenticationManager.LoginAppUserAsync(login);
+        if (user is null || isUserWithPassword is false)
+            return NotFound("Email or password is not correct.");
+
+        var authResult = await _authenticationManager.GetSignedInAppUserToken(user);
+
+        return Ok(authResult);
+    }
+
+    [HttpDelete("Clear")]
+    [AllowAnonymous]
+    [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(AuthResult))]
+    [ProducesResponseType(statusCode: StatusCodes.Status400BadRequest, type: typeof(List<ErrorResult>))]
+    [ProducesDefaultResponseType]
+    public async Task<IActionResult> Clear([FromBody] RegisterAppUserDTO register)
+    {
+        if (ModelState.IsValid is false)
+            return BadRequest();
+
+        var result = await _authenticationManager.RegisterAppUserAsync(register);
+
+        if (result.Succeeded is false)
+        {
+            var errorResult = new List<ErrorResult>();
+            foreach (var error in result.Errors)
+            {
+                errorResult.Add(new ErrorResult() { ErrorCode = error.Code, Description = error.Description });
+            }
+
+            return BadRequest(errorResult);
+        }
+
+        var authResult = await _authenticationManager.GetSignedInAppUserToken(register.Email);
+
+        return CreatedAtAction(nameof(Delete), authResult);
+    }
+
+        // DELETE: /api/auth/login
+    [HttpDelete("Delete")]
+    [AllowAnonymous]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(AuthResult))]
+    [ProducesResponseType(statusCode: StatusCodes.Status404NotFound, type: typeof(string))]
+    [ProducesDefaultResponseType]
+    public async Task<IActionResult> Clear(LoginAppUserDTO login)
+    {
+        var user = await _authenticationManager.GetAppUserByEmail(login.Email);
+        var isUserWithPassword = await _authenticationManager.LoginAppUserAsync(login);
+        if (user is null || isUserWithPassword is false)
+            return NotFound("Email or password is not correct.");
+
+        var authResult = await _authenticationManager.GetSignedInAppUserToken(user);
+
+        return Ok(authResult);
+    }
+
+
 }

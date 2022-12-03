@@ -3,4 +3,5 @@
 public interface IAppRepository<TEntity>
 {
     Task<IQueryable<Employee>> GetAll();
+    Task PostAll();
 }
